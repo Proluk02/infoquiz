@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:infoquiz/firebase_options.dart';
+import 'package:infoquiz/splash_screen.dart';
+import 'package:infoquiz/theme/theme.dart';
+
 import 'package:infoquiz/screens/auth/sign_in_screen.dart';
 import 'package:infoquiz/screens/auth/sign_up_screen.dart';
 import 'package:infoquiz/screens/auth/reset_password_screen.dart';
@@ -8,7 +13,7 @@ import 'package:infoquiz/screens/home_screen.dart';
 import 'package:infoquiz/screens/profile_screen.dart';
 import 'package:infoquiz/screens/settings_screen.dart';
 import 'package:infoquiz/screens/quiz_screen.dart';
-import 'package:infoquiz/theme/theme.dart';
+import 'package:infoquiz/splash_screen.dart'; // ✅ Ajout ici
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,10 +22,10 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('Firebase initialisé avec succès');
+    print('✅ Firebase initialisé avec succès');
     runApp(const InfoQuizApp());
   } catch (e) {
-    print('Erreur lors de l\'initialisation de Firebase: \$e');
+    print('❌ Erreur Firebase: $e');
     runApp(const FirebaseErrorApp());
   }
 }
@@ -31,6 +36,8 @@ class FirebaseErrorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: infoquizTheme,
       home: Scaffold(
         body: Center(
           child: Padding(
@@ -46,7 +53,7 @@ class FirebaseErrorApp extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Impossible de se connecter aux services Firebase. Veuillez vérifier votre connexion internet ou réessayer plus tard.',
+                  'Impossible de se connecter à Firebase. Vérifiez votre connexion.',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -87,10 +94,10 @@ class InfoQuizApp extends StatelessWidget {
       title: 'InfoQuiz',
       debugShowCheckedModeBanner: false,
       theme: infoquizTheme,
-      initialRoute: '/',
+      home: const SplashScreen(), // ✅ Affiche d'abord l'animation
       onGenerateRoute: (settings) {
         switch (settings.name) {
-          case '/':
+          case '/signin':
             return MaterialPageRoute(builder: (_) => const SignInScreen());
           case '/signup':
             return MaterialPageRoute(builder: (_) => const SignUpScreen());
@@ -106,7 +113,6 @@ class InfoQuizApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const SettingsScreen());
           case '/quiz':
             final args = settings.arguments;
-
             if (args is Map<String, dynamic>) {
               final parsedArgs = QuizScreenArguments.fromMap(args);
               return MaterialPageRoute(
@@ -115,6 +121,7 @@ class InfoQuizApp extends StatelessWidget {
                       categoryId: parsedArgs.categoryId,
                       subcategoryId: parsedArgs.subcategoryId,
                       level: parsedArgs.level,
+                      userId: '',
                     ),
               );
             } else if (args is QuizScreenArguments) {
@@ -124,6 +131,7 @@ class InfoQuizApp extends StatelessWidget {
                       categoryId: args.categoryId,
                       subcategoryId: args.subcategoryId,
                       level: args.level,
+                      userId: '',
                     ),
               );
             } else {
@@ -151,6 +159,31 @@ class InfoQuizApp extends StatelessWidget {
                     ),
                   ),
             );
+        }
+      },
+    );
+  }
+}
+
+class InitialScreen extends StatelessWidget {
+  const InitialScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<User?>(
+      future: Future.value(FirebaseAuth.instance.currentUser),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final user = snapshot.data;
+        if (user != null) {
+          return const HomeScreen();
+        } else {
+          return const SignInScreen();
         }
       },
     );

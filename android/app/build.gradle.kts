@@ -11,6 +11,7 @@ android {
     namespace = "com.example.infoquiz"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

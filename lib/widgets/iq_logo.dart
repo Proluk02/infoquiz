@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class IQLogo extends StatelessWidget {
-  const IQLogo({Key? key}) : super(key: key);
+  const IQLogo({Key? key, required int size}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

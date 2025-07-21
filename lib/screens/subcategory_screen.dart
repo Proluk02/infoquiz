@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:infoquiz/screens/quiz_screen.dart';
 
@@ -12,6 +13,7 @@ class SubcategoryScreen extends StatelessWidget {
     required this.categoryTitle,
   });
 
+  /// Récupère les sous-catégories Firestore pour la catégorie donnée
   Future<List<Map<String, dynamic>>> fetchSubcategories() async {
     final snapshot =
         await FirebaseFirestore.instance
@@ -30,6 +32,7 @@ class SubcategoryScreen extends StatelessWidget {
     }).toList();
   }
 
+  /// Génère une couleur constante en fonction du texte (titre)
   Color _getColor(String text) {
     final colors = [
       Colors.indigo,
@@ -43,11 +46,13 @@ class SubcategoryScreen extends StatelessWidget {
     return colors[text.hashCode % colors.length];
   }
 
+  /// Retourne un emoji en fonction du titre (personnalisation)
   String _getEmoji(String title) {
-    if (title.toLowerCase().contains('algo')) return '🧠';
-    if (title.toLowerCase().contains('reseau')) return '🌐';
-    if (title.toLowerCase().contains('base')) return '🗃️';
-    if (title.toLowerCase().contains('web')) return '🌍';
+    final lower = title.toLowerCase();
+    if (lower.contains('algo')) return '🧠';
+    if (lower.contains('reseau')) return '🌐';
+    if (lower.contains('base')) return '🗃️';
+    if (lower.contains('web')) return '🌍';
     return '📘';
   }
 
@@ -58,65 +63,25 @@ class SubcategoryScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: Text(categoryTitle),
+        backgroundColor: color,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Profil',
+            onPressed: () {
+              // TODO: Naviguer vers écran Profil
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Profil non implémenté')),
+              );
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
-          // 🌟 Custom AppBar
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [color.withOpacity(0.9), color],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: Offset(0, 3),
-                ),
-              ],
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(24),
-                bottomRight: Radius.circular(24),
-              ),
-            ),
-            padding: const EdgeInsets.fromLTRB(16, 48, 16, 20),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_rounded,
-                    color: Colors.white,
-                    size: 26,
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                const SizedBox(width: 12),
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 20,
-                  child: Text(
-                    _getEmoji(categoryTitle),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    categoryTitle,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // 📋 Contenu
+          // Optionnel : tu peux laisser ton container custom en haut ici si tu veux
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: fetchSubcategories(),
@@ -219,6 +184,7 @@ class SubcategoryScreen extends StatelessWidget {
     );
   }
 
+  /// Affiche le modal bottom sheet pour choisir le niveau de quiz
   void _showLevelSheet(
     BuildContext context,
     String subId,
@@ -252,6 +218,9 @@ class SubcategoryScreen extends StatelessWidget {
                   title: Text(level.toUpperCase()),
                   onTap: () {
                     Navigator.pop(context);
+                    final user = FirebaseAuth.instance.currentUser;
+                    final userId = user?.uid ?? '';
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -260,6 +229,7 @@ class SubcategoryScreen extends StatelessWidget {
                               categoryId: categoryId,
                               subcategoryId: subId,
                               level: level,
+                              userId: userId,
                             ),
                       ),
                     );

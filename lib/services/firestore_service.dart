@@ -18,4 +18,13 @@ class FirestoreService {
       return categories;
     });
   }
+
+  static saveScoreHistory({
+    required String userId,
+    required String categoryId,
+    required String subcategoryId,
+    required String level,
+    required int score,
+    required int total,
+  }) {}
 }

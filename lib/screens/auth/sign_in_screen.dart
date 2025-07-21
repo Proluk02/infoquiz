@@ -100,7 +100,7 @@ class _SignInScreenState extends State<SignInScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const IQLogo(),
+                    const IQLogo(size: 80),
                     const SizedBox(height: 24),
                     Card(
                       elevation: 4,

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:infoquiz/screens/HistoryScreen.dart';
+import 'package:infoquiz/screens/LeaderboardScreen.dart';
 import 'package:infoquiz/models/category.dart';
 import 'package:infoquiz/services/firestore_service.dart';
+import 'package:infoquiz/theme/theme.dart';
+import 'package:infoquiz/theme/colors.dart';
 import 'package:infoquiz/widgets/category_card.dart';
 import 'package:infoquiz/widgets/home_drawer.dart';
 
@@ -55,6 +59,9 @@ class _HomeScreenState extends State<HomeScreen>
       case 'settings':
         Navigator.pushNamed(context, '/settings');
         break;
+      case 'about':
+        Navigator.pushNamed(context, '/about');
+        break;
       case 'logout':
         FirebaseAuth.instance.signOut();
         Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
@@ -72,17 +79,27 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
       key: _scaffoldKey,
       drawer: const HomeDrawer(),
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: const Color(0xFFF4F6FA),
       body: SafeArea(
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: theme.colorScheme.surface,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF212E53),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.menu_rounded, size: 28),
+                    icon: const Icon(
+                      Icons.menu_rounded,
+                      size: 28,
+                      color: Colors.white,
+                    ),
                     onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                   ),
                   const SizedBox(width: 8),
@@ -91,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen>
                       'InfoQuiz',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -101,13 +119,10 @@ class _HomeScreenState extends State<HomeScreen>
                           currentUser?.photoURL != null
                               ? NetworkImage(currentUser!.photoURL!)
                               : null,
-                      backgroundColor: theme.colorScheme.secondaryContainer,
+                      backgroundColor: Colors.white.withOpacity(0.2),
                       child:
                           currentUser?.photoURL == null
-                              ? Icon(
-                                Icons.person,
-                                color: theme.colorScheme.onSecondaryContainer,
-                              )
+                              ? const Icon(Icons.person, color: Colors.white)
                               : null,
                     ),
                     shape: RoundedRectangleBorder(
@@ -123,6 +138,10 @@ class _HomeScreenState extends State<HomeScreen>
                           const PopupMenuItem(
                             value: 'settings',
                             child: Text('Paramètres'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'about',
+                            child: Text('À propos de nous'),
                           ),
                           const PopupMenuDivider(),
                           PopupMenuItem(
@@ -141,7 +160,64 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LeaderboardScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.emoji_events),
+                    label: const Text("Classement"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF08C5D1),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      final userId = FirebaseAuth.instance.currentUser?.uid;
+                      if (userId != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => HistoryScreen(userId: userId),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.history),
+                    label: const Text("Historique"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4AA3A2),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -149,7 +225,10 @@ class _HomeScreenState extends State<HomeScreen>
                     opacity: _fadeAnimation,
                     child: Text(
                       '👋 Bonjour, $userName',
-                      style: theme.textTheme.titleMedium,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: const Color(0xFF212E53),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -161,15 +240,18 @@ class _HomeScreenState extends State<HomeScreen>
                       decoration: InputDecoration(
                         hintText: 'Rechercher une catégorie...',
                         filled: true,
-                        fillColor: theme.colorScheme.surfaceVariant,
-                        prefixIcon: Icon(
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
                           Icons.search,
-                          color: theme.colorScheme.primary,
+                          color: Color(0xFF08C5D1),
                         ),
                         suffixIcon:
                             query.isNotEmpty
                                 ? IconButton(
-                                  icon: Icon(Icons.clear),
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    color: Color(0xFF4AA3A2),
+                                  ),
                                   onPressed: () {
                                     _searchController.clear();
                                     setState(() => query = '');
@@ -177,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 )
                                 : null,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
@@ -198,7 +280,6 @@ class _HomeScreenState extends State<HomeScreen>
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
-
                     final categories = snapshot.data ?? [];
                     final filtered =
                         categories
@@ -208,16 +289,17 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                             )
                             .toList();
-
                     if (filtered.isEmpty) {
                       return Center(
                         child: Text(
                           'Aucune catégorie trouvée',
-                          style: theme.textTheme.bodyMedium,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.error,
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
                       );
                     }
-
                     return GridView.builder(
                       padding: const EdgeInsets.only(top: 8, bottom: 20),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
