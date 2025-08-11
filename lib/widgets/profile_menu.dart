@@ -47,7 +47,7 @@ class ProfileMenu extends StatelessWidget {
                       ? const Icon(
                         Icons.person_outline_rounded,
                         size: 20,
-                        color: Color(0xFF212E53),
+                        color: Color.fromARGB(255, 34, 51, 97),
                       )
                       : null,
             ),

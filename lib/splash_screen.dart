@@ -1,8 +1,11 @@
+// Écran d'accueil animé (SplashScreen) qui s'affiche au lancement de l'application
+// Affiche une animation, une citation inspirante et redirige automatiquement après quelques secondes
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:infoquiz/main.dart';
 
+// Widget principal du SplashScreen
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -10,15 +13,19 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
+// État du SplashScreen : gère l'animation, la citation et la redirection
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
+  // Contrôleur et animation pour l'icône animée
   late AnimationController _iconController;
   late Animation<double> _iconAnimation;
 
+  // Citation sélectionnée aléatoirement et affichée lettre par lettre
   late String _selectedQuote;
   String _displayedText = '';
   int _charIndex = 0;
 
+  // Liste de citations inspirantes affichées au hasard
   final List<String> _quotes = [
     '“L’apprentissage est un trésor qui suivra son propriétaire partout.”',
     '“Le savoir, c’est le pouvoir.” – Francis Bacon',
@@ -35,21 +42,21 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
+    // On choisit une citation au hasard à afficher
     _selectedQuote = _quotes[Random().nextInt(_quotes.length)];
 
+    // Initialisation de l'animation de l'icône
     _iconController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
-
     _iconAnimation = CurvedAnimation(
       parent: _iconController,
       curve: Curves.easeInOut,
     );
-
     _iconController.repeat(reverse: true);
 
-    // Effet "machine à écrire" pour la citation
+    // Affichage de la citation lettre par lettre (effet machine à écrire)
     Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (_charIndex < _selectedQuote.length) {
         setState(() {
@@ -61,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
       }
     });
 
-    // Après 15 secondes, redirection vers InitialScreen
+    // Après 15 secondes, on passe automatiquement à l'écran suivant (InitialScreen)
     Timer(const Duration(seconds: 15), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const InitialScreen()),
@@ -71,6 +78,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
+    // On libère le contrôleur d'animation pour éviter les fuites mémoire
     _iconController.dispose();
     super.dispose();
   }
@@ -87,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen>
             children: [
               const Spacer(flex: 2),
 
-              // Icône animée
+              // Bloc : Icône animée au centre de l'écran
               ScaleTransition(
                 scale: _iconAnimation,
                 child: const Icon(
@@ -99,7 +107,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               const SizedBox(height: 20),
 
-              // Titre de l'app
+              // Bloc : Titre de l'application
               Text(
                 'InfoQuiz',
                 style: theme.textTheme.headlineMedium?.copyWith(
@@ -110,7 +118,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               const SizedBox(height: 30),
 
-              // Citation en machine à écrire
+              // Bloc : Citation inspirante affichée en mode "machine à écrire"
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
@@ -126,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               const Spacer(flex: 3),
 
-              // Mention légale
+              // Bloc : Mention légale en bas de l'écran
               Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: Text(

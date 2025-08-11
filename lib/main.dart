@@ -1,11 +1,14 @@
+// Importation des packages nécessaires pour l'application Flutter et Firebase
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// Importation des fichiers internes de l'application
 import 'package:infoquiz/firebase_options.dart';
 import 'package:infoquiz/splash_screen.dart';
 import 'package:infoquiz/theme/theme.dart';
 
+// Importation des différents écrans de l'application
 import 'package:infoquiz/screens/auth/sign_in_screen.dart';
 import 'package:infoquiz/screens/auth/sign_up_screen.dart';
 import 'package:infoquiz/screens/auth/reset_password_screen.dart';
@@ -13,8 +16,11 @@ import 'package:infoquiz/screens/home_screen.dart';
 import 'package:infoquiz/screens/profile_screen.dart';
 import 'package:infoquiz/screens/settings_screen.dart';
 import 'package:infoquiz/screens/quiz_screen.dart';
-import 'package:infoquiz/splash_screen.dart'; // ✅ Ajout ici
 
+// Point d'entrée principal de l'application
+// On initialise d'abord les widgets Flutter puis Firebase
+// Si tout se passe bien, on lance l'application principale
+// Sinon, on affiche un écran d'erreur
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -30,6 +36,7 @@ void main() async {
   }
 }
 
+// Widget affiché si la connexion à Firebase échoue
 class FirebaseErrorApp extends StatelessWidget {
   const FirebaseErrorApp({super.key});
 
@@ -65,6 +72,8 @@ class FirebaseErrorApp extends StatelessWidget {
   }
 }
 
+// Classe pour transporter les arguments nécessaires à l'écran Quiz
+// Permet de passer la catégorie, la sous-catégorie et le niveau
 class QuizScreenArguments {
   final String categoryId;
   final String subcategoryId;
@@ -85,6 +94,8 @@ class QuizScreenArguments {
   }
 }
 
+// Widget principal de l'application
+// Définit le thème, l'écran de démarrage et la navigation entre les pages
 class InfoQuizApp extends StatelessWidget {
   const InfoQuizApp({super.key});
 
@@ -94,8 +105,9 @@ class InfoQuizApp extends StatelessWidget {
       title: 'InfoQuiz',
       debugShowCheckedModeBanner: false,
       theme: infoquizTheme,
-      home: const SplashScreen(), // ✅ Affiche d'abord l'animation
+      home: const SplashScreen(), // On affiche d'abord l'écran d'animation
       onGenerateRoute: (settings) {
+        // Gestion de la navigation selon le nom de la route
         switch (settings.name) {
           case '/signin':
             return MaterialPageRoute(builder: (_) => const SignInScreen());
@@ -112,6 +124,7 @@ class InfoQuizApp extends StatelessWidget {
           case '/settings':
             return MaterialPageRoute(builder: (_) => const SettingsScreen());
           case '/quiz':
+            // On récupère les arguments passés à l'écran Quiz
             final args = settings.arguments;
             if (args is Map<String, dynamic>) {
               final parsedArgs = QuizScreenArguments.fromMap(args);
@@ -135,6 +148,7 @@ class InfoQuizApp extends StatelessWidget {
                     ),
               );
             } else {
+              // Si les arguments sont invalides, on affiche un message d'erreur
               return MaterialPageRoute(
                 builder:
                     (_) => Scaffold(
@@ -148,6 +162,7 @@ class InfoQuizApp extends StatelessWidget {
               );
             }
           default:
+            // Si la page n'existe pas, on affiche un message d'erreur
             return MaterialPageRoute(
               builder:
                   (_) => Scaffold(
@@ -165,6 +180,8 @@ class InfoQuizApp extends StatelessWidget {
   }
 }
 
+// Écran qui décide si l'utilisateur doit voir la page d'accueil ou la page de connexion
+// Pratique pour la redirection automatique après le splash screen
 class InitialScreen extends StatelessWidget {
   const InitialScreen({super.key});
 
@@ -174,6 +191,7 @@ class InitialScreen extends StatelessWidget {
       future: Future.value(FirebaseAuth.instance.currentUser),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
+          // On affiche un loader pendant la vérification
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
@@ -181,8 +199,10 @@ class InitialScreen extends StatelessWidget {
 
         final user = snapshot.data;
         if (user != null) {
+          // Si l'utilisateur est connecté, on va à l'accueil
           return const HomeScreen();
         } else {
+          // Sinon, on affiche la page de connexion
           return const SignInScreen();
         }
       },

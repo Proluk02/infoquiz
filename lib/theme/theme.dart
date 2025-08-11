@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Définition des couleurs principales utilisées dans l'application
 class AppColors {
   static const Color primary = Color(0xFF2563EB); // Bleu royal (accent)
   static const Color secondary = Color(0xFFF59E0B); // Jaune safran subtil
@@ -11,12 +12,14 @@ class AppColors {
   static const Color text = Color(0xFF0F172A); // Bleu-graphite (très lisible)
 }
 
+// Thème principal de l'application (couleurs, polices, styles de boutons, etc.)
 final ThemeData infoquizTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
   scaffoldBackgroundColor: AppColors.background,
   fontFamily: 'Poppins',
 
+  // Définition du jeu de couleurs global
   colorScheme: const ColorScheme.light(
     primary: AppColors.primary,
     secondary: AppColors.secondary,
@@ -30,6 +33,7 @@ final ThemeData infoquizTheme = ThemeData(
     onError: Colors.white,
   ),
 
+  // Style de la barre d'applications (AppBar)
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.primary,
     foregroundColor: Colors.white,
@@ -42,6 +46,7 @@ final ThemeData infoquizTheme = ThemeData(
     ),
   ),
 
+  // Styles de texte principaux
   textTheme: const TextTheme(
     headlineLarge: TextStyle(
       color: AppColors.text,
@@ -61,6 +66,7 @@ final ThemeData infoquizTheme = ThemeData(
     ),
   ),
 
+  // Style des boutons surélevés (ElevatedButton)
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primary,
@@ -72,6 +78,7 @@ final ThemeData infoquizTheme = ThemeData(
     ),
   ),
 
+  // Style des champs de saisie (InputDecoration)
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
     fillColor: AppColors.surface,

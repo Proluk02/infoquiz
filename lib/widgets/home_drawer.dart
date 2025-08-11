@@ -1,3 +1,5 @@
+// Menu latéral (Drawer) affiché sur la page d'accueil
+// Permet d'accéder rapidement au profil, paramètres, aide, et déconnexion
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'drawer_tile.dart';
@@ -7,6 +9,7 @@ class HomeDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // On récupère l'utilisateur actuellement connecté
     final user = FirebaseAuth.instance.currentUser;
 
     return Drawer(
@@ -15,6 +18,7 @@ class HomeDrawer extends StatelessWidget {
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
+            // Bloc : En-tête du drawer avec l'avatar, le nom et l'email
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
@@ -48,6 +52,7 @@ class HomeDrawer extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Bloc : Nom d'utilisateur
                         Text(
                           user?.displayName ?? 'Utilisateur',
                           style: const TextStyle(
@@ -58,6 +63,7 @@ class HomeDrawer extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
+                        // Bloc : Email de l'utilisateur
                         Text(
                           user?.email ?? '',
                           style: TextStyle(
@@ -73,6 +79,7 @@ class HomeDrawer extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
+            // Bloc : Liste des options du menu
             Expanded(
               child: ListView(
                 children: [
@@ -104,6 +111,7 @@ class HomeDrawer extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     child: Divider(),
                   ),
+                  // Bloc : Déconnexion
                   DrawerTile(
                     icon: Icons.logout,
                     title: 'Déconnexion',
@@ -121,6 +129,7 @@ class HomeDrawer extends StatelessWidget {
                 ],
               ),
             ),
+            // Bloc : Mention légale en bas du drawer
             const Padding(
               padding: EdgeInsets.only(bottom: 16),
               child: Text(

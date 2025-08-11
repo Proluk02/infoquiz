@@ -1,7 +1,10 @@
+// Bouton texte cliquable, utilisé pour les liens (ex : "Mot de passe oublié ?")
 import 'package:flutter/material.dart';
 
 class IQLinkButton extends StatelessWidget {
+  // Texte du lien
   final String label;
+  // Action à effectuer au clic
   final VoidCallback onTap;
 
   const IQLinkButton({Key? key, required this.label, required this.onTap})

@@ -1,10 +1,16 @@
+// Bouton personnalisé pour l'application InfoQuiz
+// Permet d'afficher un texte, une icône optionnelle et un loader si besoin
 import 'package:flutter/material.dart';
 
 class IQButton extends StatelessWidget {
+  // Texte du bouton
   final String label;
+  // Action à effectuer au clic
   final VoidCallback onPressed;
+  // Affiche un loader si true
   final bool loading;
-  final IconData? icon; // Optionnel
+  // Icône optionnelle à afficher à gauche du texte
+  final IconData? icon;
 
   const IQButton({
     Key? key,
@@ -16,6 +22,7 @@ class IQButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Couleurs du bouton selon le thème
     final btnColor = Theme.of(context).colorScheme.primary;
     final textColor = Theme.of(context).colorScheme.onPrimary;
 
@@ -45,6 +52,7 @@ class IQButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child:
                 loading
+                    // Bloc : Loader circulaire si loading = true
                     ? const SizedBox(
                       height: 22,
                       width: 22,
@@ -53,6 +61,7 @@ class IQButton extends StatelessWidget {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
+                    // Bloc : Texte et icône du bouton
                     : Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

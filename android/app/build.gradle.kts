@@ -1,17 +1,18 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
-    
 }
 
 android {
     namespace = "com.example.infoquiz"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-    
+    ndkVersion = "27.0.12077973"
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -23,25 +24,51 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.infoquiz"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+// 🔐 Chargement du fichier key.properties uniquement pour les builds release
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+signingConfigs {
+    // Crée la configuration uniquement si on est en release et que tout est bien défini
+    create("release") {
+        val storeFilePath = keystoreProperties["storeFile"]?.toString()
+        val storePasswordValue = keystoreProperties["storePassword"]?.toString()
+        val keyAliasValue = keystoreProperties["keyAlias"]?.toString()
+        val keyPasswordValue = keystoreProperties["keyPassword"]?.toString()
+
+        // Applique uniquement si toutes les valeurs sont présentes
+        if (
+            storeFilePath != null &&
+            storePasswordValue != null &&
+            keyAliasValue != null &&
+            keyPasswordValue != null
+        ) {
+            storeFile = file(storeFilePath)
+            storePassword = storePasswordValue
+            keyAlias = keyAliasValue
+            keyPassword = keyPasswordValue
         }
     }
 }
 
-flutter {
-    source = "../.."
+buildTypes {
+    getByName("release") {
+        // Appliquer la signature que si elle est bien définie
+        if (signingConfigs.findByName("release") != null) {
+            signingConfig = signingConfigs.getByName("release")
+        }
+        isMinifyEnabled = false
+        isShrinkResources = false
+        proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+    }
+}
 }

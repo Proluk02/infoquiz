@@ -1,3 +1,5 @@
+// Fonction utilitaire qui convertit un nom d'icône (String) en IconData Flutter
+// Permet d'afficher dynamiquement des icônes selon le nom stocké en base
 import 'package:flutter/material.dart';
 
 IconData getIconFromString(String iconName) {

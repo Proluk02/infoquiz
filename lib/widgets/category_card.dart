@@ -1,13 +1,17 @@
+// Widget qui affiche une carte de catégorie sur la page d'accueil
+// Permet d'accéder aux sous-catégories ou directement au quiz selon le cas
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:infoquiz/models/category.dart';
 import 'package:infoquiz/screens/subcategory_screen.dart';
 
 class CategoryCard extends StatelessWidget {
+  // La catégorie à afficher sur la carte
   final Category category;
 
   const CategoryCard({super.key, required this.category});
 
+  // Liste de dégradés de couleurs pour donner un style unique à chaque carte
   static const List<List<Color>> _gradientColors = [
     [Color(0xFFA1C4FD), Color(0xFFC2E9FB)], // bleu clair pastel
     [Color(0xFFFBC7AA), Color(0xFFFBE8A6)], // pêche doux
@@ -18,10 +22,12 @@ class CategoryCard extends StatelessWidget {
     [Color(0xFFE0C3FC), Color(0xFF8EC5FC)], // violet clair dégradé
   ];
 
+  // Retourne un dégradé de couleur selon le titre de la catégorie
   List<Color> _getGradientColors(String title) {
     return _gradientColors[title.hashCode % _gradientColors.length];
   }
 
+  // Retourne une icône adaptée selon le titre de la catégorie
   IconData _getCategoryIcon(String title) {
     final keywords = title.toLowerCase();
     if (keywords.contains('math')) return Icons.calculate;
@@ -33,6 +39,7 @@ class CategoryCard extends StatelessWidget {
     return Icons.school;
   }
 
+  // Vérifie si la catégorie possède des sous-catégories dans Firestore
   Future<bool> _hasSubcategories() async {
     final snapshot =
         await FirebaseFirestore.instance
@@ -44,6 +51,9 @@ class CategoryCard extends StatelessWidget {
     return snapshot.docs.isNotEmpty;
   }
 
+  // Action à effectuer lors du clic sur la carte :
+  // - Si sous-catégories, on va à l'écran des sous-catégories
+  // - Sinon, on lance directement le quiz
   void _onTap(BuildContext context) async {
     final hasSubs = await _hasSubcategories();
     if (hasSubs) {
@@ -72,17 +82,18 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // On récupère le dégradé et l'icône adaptés à la catégorie
     final gradientColors = _getGradientColors(category.title);
     final icon = _getCategoryIcon(category.title);
 
-    // Texte en noir semi-transparent pour un bon contraste sur fond clair pastel
+    // Couleurs de texte et d'icône pour un bon contraste
     final textColor = Colors.black.withOpacity(0.75);
     final iconColor = Colors.black.withOpacity(0.7);
 
     return GestureDetector(
       onTap: () => _onTap(context),
       child: SizedBox(
-        width: 130, // Légèrement réduit pour compacité
+        width: 130, // Largeur de la carte
         height: 130,
         child: Container(
           decoration: BoxDecoration(
@@ -104,8 +115,10 @@ class CategoryCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Bloc : Icône de la catégorie
               Icon(icon, size: 28, color: iconColor),
               const SizedBox(height: 6),
+              // Bloc : Titre de la catégorie
               Text(
                 category.title,
                 textAlign: TextAlign.center,

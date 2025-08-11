@@ -1,14 +1,18 @@
+// Script utilitaire pour insérer les catégories et sous-catégories dans Firestore
+// À lancer une seule fois pour initialiser la base de données
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../firebase_options.dart'; // adapte le chemin si besoin
 
 Future<void> main() async {
+  // Initialisation de Flutter et de Firebase
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final firestore = FirebaseFirestore.instance;
 
+  // Liste des catégories à insérer (avec icône et sous-catégories)
   final List<Map<String, dynamic>> categories = [
     {
       "title": "Informatique & TIC",
@@ -159,6 +163,7 @@ Future<void> main() async {
     },
   ];
 
+  // Ajout de chaque catégorie dans Firestore
   for (var category in categories) {
     await firestore.collection('categories').add(category);
     print("✔️ Catégorie '${category['title']}' ajoutée !");
